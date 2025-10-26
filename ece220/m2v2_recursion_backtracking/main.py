@@ -26,3 +26,43 @@ class Intro(Scene):
         ).center()))
         
         self.play(FadeOut(*self.mobjects))
+
+class Functions(Scene):
+    def construct(self):
+        question = Text("?")
+        self.play(Write(question))
+        
+        example_function = Code(
+            code_string=r"""
+static int myFunction(int foo, int bar) { 
+    int number = foo + bar;
+    return number;
+}
+""",
+            language="py",
+            add_line_numbers=False
+        )
+        self.play(Transform(question, example_function))
+
+        # Modifiers
+        modifier_highlight = SurroundingRectangle(example_function.code_lines.lines[0][0][0:6], color=YELLOW)
+        modifier_annotation = Text("Modifier", font_size=25, color=YELLOW).next_to(modifier_highlight, LEFT)
+        
+        # Return Type
+        return_type_highlight = SurroundingRectangle(example_function.code_lines.lines[0][0][7:10], color=GREEN)
+        return_type_annotation = Text("Return Type", font_size=25, color=GREEN).next_to(return_type_highlight, UP).shift(LEFT)
+        
+        # Name
+        name_highlight = SurroundingRectangle(example_function.code_lines.lines[0][0][11:21], color=RED)
+        name_annotation = Text("Name", font_size=25, color=RED).next_to(name_highlight, UP)
+        
+        # Parameters
+        parameters_highlight = SurroundingRectangle(example_function.code_lines.lines[0][0][22:-4], color=ORANGE)
+        parameters_annotation = Text("Parameters", font_size=25, color=ORANGE).next_to(parameters_highlight, UP)
+
+        self.play(
+            Create(modifier_highlight), Write(modifier_annotation), 
+            Create(return_type_highlight), Write(return_type_annotation), 
+            Create(name_highlight), Write(name_annotation), 
+            Create(parameters_highlight), Write(parameters_annotation)
+        )
