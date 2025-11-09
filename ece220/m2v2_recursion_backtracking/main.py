@@ -1,6 +1,7 @@
 from itertools import chain
 
 from manim import *
+from manim.mobject.text.text_mobject import remove_invisible_chars
 
 from manim_hkn.utils import *
 from manim_hkn import *
@@ -179,25 +180,59 @@ int main() {
         example_function_5 = Code(
             code_string=r"""
 int count() {
-    // running_count is persistent across function calls, it is 
+    // runningCount is persistent across function calls, it is 
     // NOT reset to 0 each time the function is called
-    static int running_count = 0; 
-    running_count++;
-    return running_count;
+    static int runningCount = 0; 
+    runningCount++;
+    return runningCount;
 }
 int main() {
-    count(); // set running_count to 0 and increment to 1
-    count(); // now increment running_count to 2
+    count(); // set runningCount to 0 and increment to 1
+    count(); // now increment runningCount to 2
     printf("%d\n", count()); // this will increment to 3 and print 3
-    int rc = running_count; // this will cause an error from trying 
+    int rc = runningCount; // this will cause an error from trying 
                             // to access a variable local to count()
 	return 0;
 }
 """,
             language="c",
-            add_line_numbers=False, 
+            add_line_numbers=True, 
             formatter_style="dracula"
         )
         self.play(FadeOut(example_function, modifier_annotation), Write(example_function_5))
-        self.play(example_function_5.animate.scale(0.5).to_edge(LEFT))
         
+        monospace = lambda text: MarkupText(f"<span font_family=\"monospace\">{text}</span>")
+        vals_5 = {"runningCount": "0", "rc": "-"}
+        example_table_5 = Table(
+            col_labels=[monospace("runningCount"), monospace("rc")], 
+            table=[[vals_5["runningCount"], vals_5["rc"]]]
+        ).scale(0.65).to_edge(RIGHT)
+        self.play(example_function_5.animate.scale(0.5).to_edge(LEFT), Create(example_table_5))
+        
+        run_5 = [
+            (9, {}, None), 
+            (4, {"runningCount": 0}, None), 
+            (5, {"runningCount": 1}, None), 
+            (6, {}, None), 
+            (10, {}, None), 
+            (4, {"runningCount": 0}, None), 
+            (5, {"runningCount": 2}, None), 
+            (6, {}, None), 
+            (11, {}, None), 
+            (4, {"runningCount": 0}, None), 
+            (5, {"runningCount": 3}, None), 
+            (6, {}, None), 
+            (11, {}, None), 
+            (12, {}, None), 
+            (14, {}, None)
+        ]
+        code_highlight = SurroundingRectangle(
+            remove_invisible_chars(example_function_5.code_lines.lines[0][run_5[0][0] - 1]), buff=0, stroke_width=1
+        ).stretch_to_fit_width(example_function_5.background.width).align_to(example_function_5.background, LEFT)
+        self.play(Create(code_highlight))
+        for line, vals, func in run_5:
+            code_line = remove_invisible_chars(example_function_5.code_lines.lines[0][line - 1])
+            self.play(
+                code_highlight.animate.set_y(code_line.get_y())
+            )
+            self.wait(0.25)
