@@ -6,8 +6,12 @@ from manim.mobject.text.text_mobject import remove_invisible_chars
 from manim_hkn.utils import *
 from manim_hkn import *
 
-class Intro(Scene):
+from common.util import *
+
+class Intro(SectionalizedScene):
     def construct(self):
+        # self.skip_section_animations = True
+        
         hkn_emblem = ImageMobject("../../assets/hkn_alpha_emblem.png", z_index=1)
 
         self.play(FadeIn(hkn_emblem))
@@ -30,8 +34,10 @@ class Intro(Scene):
         
         self.play(FadeOut(*self.mobjects))
 
-class Functions(Scene):
+class Functions(SectionalizedScene):
     def construct(self):
+        self.skip_section_animations = True
+        
         question = Text("?")
         self.play(Write(question))
         
@@ -200,7 +206,7 @@ int main() {
             formatter_style="dracula"
         )
         self.play(FadeOut(example_function, modifier_annotation), Write(example_function_5))
-        
+                
         monospace = lambda text: MarkupText(f"<span font_family=\"monospace\">{text}</span>")
         vals_5 = {"runningCount": "0", "rc": "-"}
         example_table_5 = Table(
@@ -208,20 +214,22 @@ int main() {
             table=[[vals_5["runningCount"], vals_5["rc"]]]
         ).scale(0.65).to_edge(RIGHT)
         self.play(example_function_5.animate.scale(0.5).to_edge(LEFT), Create(example_table_5))
+
+        self.skip_section_animations = False
         
         run_5 = [
             (9, {}, None), 
-            (4, {"runningCount": 0}, None), 
-            (5, {"runningCount": 1}, None), 
-            (6, {}, None), 
+            (4, {}, None), 
+            (5, {"runningCount": 0}, None), 
+            (6, {"runningCount": 1}, None), 
             (10, {}, None), 
-            (4, {"runningCount": 0}, None), 
-            (5, {"runningCount": 2}, None), 
-            (6, {}, None), 
+            (4, {}, None), 
+            (5, {}, None), 
+            (6, {"runningCount": 2}, None), 
             (11, {}, None), 
-            (4, {"runningCount": 0}, None), 
-            (5, {"runningCount": 3}, None), 
-            (6, {}, None), 
+            (4, {}, None), 
+            (5, {}, None), 
+            (6, {"runningCount": 3}, None), 
             (11, {}, None), 
             (12, {}, None), 
             (14, {}, None)

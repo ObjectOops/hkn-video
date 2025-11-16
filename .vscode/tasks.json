@@ -4,7 +4,7 @@
         {
             "label": "Manim Render Video (QL)",
             "type": "shell",
-            "command": "cd ${fileDirname} && manim main.py $(cat dev_scene)",
+            "command": "export PYTHONPATH='${env:PYTHONPATH}:${workspaceFolder}' && cd ${fileDirname} && manim main.py $(cat dev_scene)",
             "problemMatcher": [
                 "$python"
             ]
@@ -12,7 +12,7 @@
         {
             "label": "Manim Render Video (s)",
             "type": "shell",
-            "command": "cd ${fileDirname} && manim -s main.py $(cat dev_scene)",
+            "command": "export PYTHONPATH='${env:PYTHONPATH}:${workspaceFolder}' && cd ${fileDirname} && manim -s main.py $(cat dev_scene)",
             "problemMatcher": [
                 "$python"
             ],
