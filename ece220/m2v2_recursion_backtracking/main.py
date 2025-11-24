@@ -193,7 +193,7 @@ int count() {
 int main() {
     count(); // set runningCount to 0 and increment to 1
     count(); // now increment runningCount to 2
-    printf("%d\n", count()); // this will increment to 3 and print 3
+    printf("runningCount: %d\n", count()); // this will increment to 3 and print 3
     int rc = runningCount; // this will cause an error from trying 
                             // to access a variable local to count()
 	return 0;
@@ -210,7 +210,7 @@ int main() {
         example_table_5 = Table(
             col_labels=[monospace(label) for label in labels_5], 
             table=[["0", "-"]]
-        ).scale(0.65).to_edge(RIGHT)
+        ).scale(0.5).to_edge(RIGHT)
         self.play(example_function_5.animate.scale(0.5).to_edge(LEFT), Create(example_table_5))
 
         self.skip_section_animations = False
@@ -229,14 +229,15 @@ int main() {
             (5, {}, None), 
             (6, {"runningCount": "3"}, None), 
             (11, {}, None), 
-            (12, {}, None), 
+            (12, {}, "runningCount: 3"), 
             (14, {}, None)
         ]
         code_highlight = SurroundingRectangle(
             remove_invisible_chars(example_function_5.code_lines.lines[0][run_5[0][0] - 1]), buff=0, stroke_width=1
         ).stretch_to_fit_width(example_function_5.background.width).align_to(example_function_5.background, LEFT)
         self.play(Create(code_highlight))
-        for line, vals, func in run_5:
+        current_output = None
+        for line, vals, out in run_5:
             code_line = remove_invisible_chars(example_function_5.code_lines.lines[0][line - 1])
             value_update_animations = []
             for key, val in vals.items():
@@ -244,9 +245,14 @@ int main() {
                 text_cell_updated = Paragraph(val).match_width(text_cell).move_to(text_cell)
                 value_update_animations.append(Transform(text_cell, text_cell_updated))
                 value_update_animations.append(Circumscribe(text_cell))
+            if current_output != None and out != None:
+                self.remove(current_output)
+            if out != None:
+                current_output = Text(out).to_edge(DOWN)
             self.play(
                 code_highlight.animate.match_y(code_line), 
-                *value_update_animations
+                *value_update_animations, 
+                AddTextLetterByLetter(current_output) if out != None else Wait()
             )
             self.wait(0.25)
         
