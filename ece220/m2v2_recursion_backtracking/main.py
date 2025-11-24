@@ -11,12 +11,8 @@ from common.util import *
 class Intro(SectionalizedScene):
     def construct(self):
         # self.skip_section_animations = True
-        
-        hkn_emblem = ImageMobject("../../assets/hkn_alpha_emblem.png", z_index=1)
 
-        self.play(FadeIn(hkn_emblem))
-        self.wait(0.75)
-        self.play(hkn_emblem.animate.scale(0.3).to_corner(UR), run_time = 1.5)
+        self.hkn_emblem_animation()
         
         self.play(Write(Title("Recursion and Backtracking")))
         self.play(Write(Tex(r"""
@@ -32,11 +28,13 @@ class Intro(SectionalizedScene):
             \end{itemize}""", font_size=40
         ).center()))
         
-        self.play(FadeOut(*self.mobjects))
+        self.end_scene()
 
 class Functions(SectionalizedScene):
     def construct(self):
         self.skip_section_animations = True
+        
+        self.hkn_emblem_add()
         
         question = Text("?")
         self.play(Write(question))
@@ -52,7 +50,7 @@ static int myFunction(int foo, int bar) {
             add_line_numbers=False, 
             formatter_style="dracula"
         )
-        self.play(Transform(question, example_function, replace_mobject_with_target_in_scene=True))
+        self.play(ReplacementTransform(question, example_function))
 
         # Modifiers
         modifier_chars = example_function.code_lines.lines[0][0][0:6]
@@ -135,7 +133,7 @@ void divide(int* foo, int bar) {
             add_line_numbers=False, 
             formatter_style="dracula"
         )
-        self.play(Transform(example_function_2, example_function_3, replace_mobject_with_target_in_scene=True))
+        self.play(ReplacementTransform(example_function_2, example_function_3))
         
         # Section: Names and Parameters
         self.play(FadeOut(example_function_3), FadeIn(example_function, parameters_annotation))
@@ -208,10 +206,10 @@ int main() {
         self.play(FadeOut(example_function, modifier_annotation), Write(example_function_5))
                 
         monospace = lambda text: MarkupText(f"<span font_family=\"monospace\">{text}</span>")
-        vals_5 = {"runningCount": "0", "rc": "-"}
+        labels_5 = ["runningCount", "rc"]
         example_table_5 = Table(
-            col_labels=[monospace("runningCount"), monospace("rc")], 
-            table=[[vals_5["runningCount"], vals_5["rc"]]]
+            col_labels=[monospace(label) for label in labels_5], 
+            table=[["0", "-"]]
         ).scale(0.65).to_edge(RIGHT)
         self.play(example_function_5.animate.scale(0.5).to_edge(LEFT), Create(example_table_5))
 
@@ -220,16 +218,16 @@ int main() {
         run_5 = [
             (9, {}, None), 
             (4, {}, None), 
-            (5, {"runningCount": 0}, None), 
-            (6, {"runningCount": 1}, None), 
+            (5, {"runningCount": "0"}, None), 
+            (6, {"runningCount": "1"}, None), 
             (10, {}, None), 
             (4, {}, None), 
             (5, {}, None), 
-            (6, {"runningCount": 2}, None), 
+            (6, {"runningCount": "2"}, None), 
             (11, {}, None), 
             (4, {}, None), 
             (5, {}, None), 
-            (6, {"runningCount": 3}, None), 
+            (6, {"runningCount": "3"}, None), 
             (11, {}, None), 
             (12, {}, None), 
             (14, {}, None)
@@ -240,7 +238,16 @@ int main() {
         self.play(Create(code_highlight))
         for line, vals, func in run_5:
             code_line = remove_invisible_chars(example_function_5.code_lines.lines[0][line - 1])
+            value_update_animations = []
+            for key, val in vals.items():
+                text_cell = example_table_5.get_entries_without_labels((1, labels_5.index(key) + 1))
+                text_cell_updated = Paragraph(val).match_width(text_cell).move_to(text_cell)
+                value_update_animations.append(Transform(text_cell, text_cell_updated))
+                value_update_animations.append(Circumscribe(text_cell))
             self.play(
-                code_highlight.animate.set_y(code_line.get_y())
+                code_highlight.animate.match_y(code_line), 
+                *value_update_animations
             )
             self.wait(0.25)
+        
+        # self.end_scene()
