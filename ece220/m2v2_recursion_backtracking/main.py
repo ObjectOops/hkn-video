@@ -52,10 +52,10 @@ static int myFunction(int foo, int bar) {
         )
         self.play(ReplacementTransform(question, example_function))
 
-        # Modifiers
-        modifier_chars = example_function.code_lines.lines[0][0][0:6]
-        modifier_highlight = SurroundingRectangle(modifier_chars, color=YELLOW)
-        modifier_annotation = Text("Modifier", font_size=25, color=YELLOW).next_to(modifier_highlight, LEFT)
+        # Specifiers
+        specifier_chars = example_function.code_lines.lines[0][0][0:6]
+        specifier_highlight = SurroundingRectangle(specifier_chars, color=YELLOW)
+        specifier_annotation = Text("Specifier", font_size=25, color=YELLOW).next_to(specifier_highlight, LEFT)
         
         # Return Type
         return_type_chars = example_function.code_lines.lines[0][0][7:10]
@@ -73,7 +73,7 @@ static int myFunction(int foo, int bar) {
 
         highlight_annotations = [
             (return_type_highlight, return_type_annotation), 
-            (modifier_highlight, modifier_annotation), 
+            (specifier_highlight, specifier_annotation), 
             (name_highlight, name_annotation), 
             (parameters_highlight, parameters_annotation)
         ]
@@ -83,7 +83,7 @@ static int myFunction(int foo, int bar) {
         
         # Section: Return Types
         self.play(FadeOut(
-            modifier_highlight, modifier_annotation, 
+            specifier_highlight, specifier_annotation, 
             return_type_highlight, 
             name_highlight, name_annotation, 
             parameters_highlight, parameters_annotation
@@ -177,9 +177,9 @@ int main() {
         )
         self.play(FadeOut(example_function), Write(example_function_4))
         
-        # Section: Static Modifier
-        self.play(FadeOut(example_function_4), FadeIn(example_function, modifier_annotation))
-        self.play(Indicate(modifier_chars))
+        # Section: Static Specifier
+        self.play(FadeOut(example_function_4), FadeIn(example_function, specifier_annotation))
+        self.play(Indicate(specifier_chars))
         
         example_function_5 = Code(
             code_string=r"""
@@ -203,7 +203,7 @@ int main() {
             add_line_numbers=True, 
             formatter_style="dracula"
         )
-        self.play(FadeOut(example_function, modifier_annotation), Write(example_function_5))
+        self.play(FadeOut(example_function, specifier_annotation), Write(example_function_5))
                 
         monospace = lambda text: MarkupText(f"<span font_family=\"monospace\">{text}</span>")
         labels_5 = ["runningCount", "rc"]
