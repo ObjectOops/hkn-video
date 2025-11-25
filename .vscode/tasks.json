@@ -10,7 +10,7 @@
             ]
         },
         {
-            "label": "Manim Render Video (s)",
+            "label": "Manim Render Frame (s)",
             "type": "shell",
             "command": "export PYTHONPATH='${env:PYTHONPATH}:${workspaceFolder}' && cd ${fileDirname} && manim -s main.py $(cat dev_scene)",
             "problemMatcher": [

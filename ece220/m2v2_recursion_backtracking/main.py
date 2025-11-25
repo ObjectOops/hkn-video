@@ -250,7 +250,7 @@ int main() {
             self.play(
                 code_highlight.animate.match_y(code_line), 
                 *value_update_animations, 
-                AddTextLetterByLetter(current_output) if out is not None else Wait()
+                TypeWithCursor(current_output) if out is not None else Wait()
             )
             if (len(other) > 0):
                 self.play(*other)
@@ -332,8 +332,6 @@ class Recursion(SectionalizedScene):
         
         self.hkn_emblem_add()
         
-        self.skip_section_animations = False
-
         question = Text("Recursion")
         notes = Tex(r"""
             \begin{itemize}
@@ -359,9 +357,7 @@ int fibonacci(int n) {
     }
     
     // Recursive Case: Calls itself using the fibonacci definition
-    else {
-        return fibonacci(n - 1) + fibonacci(n - 2); 
-    }
+    return fibonacci(n - 1) + fibonacci(n - 2); 
 }
 """,
             language="c",
@@ -380,15 +376,60 @@ int fibonacci(int n) {
         tips_fibonacci = [
             "All recursive functions must have a base case and recursive case.", 
             "The base case is what allows the function to actually stop and return something.", 
-            "Stack overflow --> segmentation fault: runtime stack grows too large.", 
+            "Stack overflow, segmentation fault: runtime stack grows too large.", 
             "Check to make sure you eventually reach your base case!"
         ]
         current_tip = None
         for tip in tips_fibonacci:
             self.play(
                 FadeOut(current_tip) if current_tip is not None else Wait(), 
-                FadeIn(current_tip := Text(tip).scale(0.4).align_to(example_fibonacci, DOWN).shift(DOWN))
+                FadeIn(current_tip := Text(tip).scale(0.5).align_to(example_fibonacci, DOWN).shift(DOWN))
             )
+                
+        self.play(FadeOut(current_tip, base_case_outline, recursive_case_outline), example_fibonacci.animate.scale(0.5).to_corner(UL))
+                
+        fibonacci = lambda n: n if n == 0 or n == 1 else fibonacci(n - 1) + fibonacci(n - 2)
+        def fibonacci_tree(n):
+            fib = monospace(f"fibonacci({n}) == {fibonacci(n)}").scale(0.3)
+            fib_center = fib.get_edge_center(DOWN)
+            if n == 0 or n == 1:
+                return fib, VGroup(fib)
+            fib_sub_1 = fibonacci_tree(n - 2)
+            fib_sub_2 = fibonacci_tree(n - 1)
+            fib_left, fib_left_group = fib_sub_1 if n % 2 == 0 else fib_sub_2
+            fib_right, fib_right_group = fib_sub_2 if n % 2 == 0 else fib_sub_1
+            fib_left_group.shift(fib_center + DOWN * 0.25 + LEFT * 1.25 - fib_left.get_edge_center(UP))
+            fib_right_group.shift(fib_center + DOWN * 0.25 + RIGHT * 1.25 + DOWN * (fibonacci(n) / 2.5 - 1 / 2.5) + RIGHT * (fibonacci(n) - 1) - fib_right.get_edge_center(UP))
+            return fib, VGroup(
+                fib, fib_left_group, fib_right_group, 
+                Line(fib_left.get_edge_center(UP), fib_center, buff=0.1), 
+                Line(fib_right.get_edge_center(UP), fib_center, buff=0.1)
+            )
+        
+        # Base Cases
+        fib_base = VGroup(fibonacci_tree(0), fibonacci_tree(1)).arrange()
+        self.play(Create(fib_base))
+        
+        # fibonacci(2)
+        fib_2 = fibonacci_tree(2)[1]
+        self.play(FadeOut(fib_base), FadeIn(fib_2))
+        fib_base = fib_2
+        
+        # fibonacci(3)
+        self.play(Transform(fib_base, fibonacci_tree(3)[1]))
+        
+        # fibonacci(4)
+        self.play(Transform(fib_base, fibonacci_tree(4)[1].shift(UP)))
+        
+        # fibonacci(5)
+        self.play(Transform(fib_base, fibonacci_tree(5)[1].shift(UP * 2)))
+        
+        # fibonacci(6)
+        self.play(Transform(fib_base, fibonacci_tree(6)[1].scale_to_fit_width(config.frame_width).to_corner(UL)), example_fibonacci.animate.shift(LEFT * 7))
+        
+        self.skip_section_animations = False
+        
+        
         
         # self.end_scene()
 
