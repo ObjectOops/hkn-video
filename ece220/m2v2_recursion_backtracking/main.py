@@ -32,7 +32,7 @@ class Intro(SectionalizedScene):
 
 class Functions(SectionalizedScene):
     def construct(self):
-        self.skip_section_animations = True
+        # self.skip_section_animations = True
         
         self.hkn_emblem_add()
         
@@ -156,8 +156,8 @@ static void myFunction(char foo, int bar)
         # Section: Scope
         self.play(FadeOut(parameters_annotation))
         self.play(
-            Indicate(example_function.code_lines.lines[0][0][-1]), 
-            Indicate(example_function.code_lines.lines[0][-1][-1])
+            Circumscribe(remove_invisible_chars(example_function.code_lines.lines[0][0])[-1]), 
+            Circumscribe(remove_invisible_chars(example_function.code_lines.lines[0][-1])[-1])
         )
         example_function_4 = Code(
             code_string=r"""
@@ -202,42 +202,40 @@ int main() {
             language="c",
             add_line_numbers=True, 
             formatter_style="dracula"
-        )
+        ).scale(0.75)
         self.play(FadeOut(example_function, specifier_annotation), Write(example_function_5))
                 
-        monospace = lambda text: MarkupText(f"<span font_family=\"monospace\">{text}</span>")
         labels_5 = ["runningCount", "rc"]
         example_table_5 = Table(
             col_labels=[monospace(label) for label in labels_5], 
             table=[["0", "-"]]
         ).scale(0.5).to_edge(RIGHT)
-        self.play(example_function_5.animate.scale(0.5).to_edge(LEFT), Create(example_table_5))
+        self.play(example_function_5.animate.scale(0.5 / 0.75).to_edge(LEFT), Create(example_table_5))
 
-        self.skip_section_animations = False
-        
-        run_5 = [
-            (9, {}, None), 
-            (4, {}, None), 
-            (5, {"runningCount": "0"}, None), 
-            (6, {"runningCount": "1"}, None), 
-            (10, {}, None), 
-            (4, {}, None), 
-            (5, {}, None), 
-            (6, {"runningCount": "2"}, None), 
-            (11, {}, None), 
-            (4, {}, None), 
-            (5, {}, None), 
-            (6, {"runningCount": "3"}, None), 
-            (11, {}, None), 
-            (12, {}, "runningCount: 3"), 
-            (14, {}, None)
-        ]
+        run_start_5 = (9, {}, None, [])
         code_highlight = SurroundingRectangle(
-            remove_invisible_chars(example_function_5.code_lines.lines[0][run_5[0][0] - 1]), buff=0, stroke_width=1
+            remove_invisible_chars(example_function_5.code_lines.lines[0][run_start_5[0] - 1]), buff=0, stroke_width=1
         ).stretch_to_fit_width(example_function_5.background.width).align_to(example_function_5.background, LEFT)
         self.play(Create(code_highlight))
+        run_5 = [
+            run_start_5, 
+            (4, {}, None, []), 
+            (5, {"runningCount": "0"}, None, []), 
+            (6, {"runningCount": "1"}, None, []), 
+            (10, {}, None, []), 
+            (4, {}, None, []), 
+            (5, {}, None, []), 
+            (6, {"runningCount": "2"}, None, []), 
+            (11, {}, None, []), 
+            (4, {}, None, []), 
+            (5, {}, None, []), 
+            (6, {"runningCount": "3"}, None, []), 
+            (11, {}, None, []), 
+            (12, {}, "runningCount: 3", [Succession(Wiggle(code_highlight), Indicate(code_highlight, scale_factor=1, color=RED))]), 
+            (14, {}, None, [])
+        ]
         current_output = None
-        for line, vals, out in run_5:
+        for line, vals, out, other in run_5:
             code_line = remove_invisible_chars(example_function_5.code_lines.lines[0][line - 1])
             value_update_animations = []
             for key, val in vals.items():
@@ -254,6 +252,179 @@ int main() {
                 *value_update_animations, 
                 AddTextLetterByLetter(current_output) if out != None else Wait()
             )
+            if (len(other) > 0):
+                self.play(*other)
             self.wait(0.25)
+                
+        self.play(FadeOut(example_function_5, code_highlight, example_table_5, current_output))
+        
+        example_function_6 = Code(
+            code_string=r"""
+static int myFunctionStatic(int foo, int bar) { 
+    int number = foo + bar;
+    return number;
+}  
+
+int mySecondFunction() {
+    int firstNum = 3;
+    int secondNum = 4;
+    // Here the function call is valid and we return 7 
+    return myFunctionStatic(firstNum, secondNum);
+}
+""",
+            language="c",
+            add_line_numbers=False, 
+            formatter_style="dracula", 
+            background="window"
+        ).scale(0.75)
+        example_title_6 = monospace("file_1.c").scale(0.4).align_to(example_function_6.background.get_top(), UP).shift(0.1 * DOWN)
+        self.play(Create(example_function_6), Write(example_title_6))
+        
+        example_chars_6 = example_function_6.code_lines.lines[0]
+        self.play(Succession(
+            Indicate(example_title_6), 
+            Indicate(example_chars_6[0][11:27]), 
+            Indicate(example_chars_6[0][0:6]), 
+            Indicate(example_chars_6[5][4:20])
+        ))
+        example_caption_6 = Text("Inside same translation unit: ✔️", color=GREEN).scale(0.5).align_to(example_function_6.background.get_bottom(), UP).shift(0.1 * DOWN)
+        self.play(Write(example_caption_6))
+        
+        example_group_6 = VGroup(example_function_6, example_title_6, example_caption_6)
+        question_2 = Text("Another translation unit / file...")
+        self.play(example_group_6.animate.scale(0.75).to_edge(UP), Write(question_2))
+        
+        example_function_7 = Code(
+            code_string=r"""
+int multiplier(int foo, int bar){ 
+    int number = 0;
+    for (int i = 0; i < bar; i++){
+        // This will throw an error because myFunctionStatic is 
+        // static inside file_1.c
+        number += myFunctionStatic(foo, number); 
+    }
+    return number;
+}
+""",
+            language="c",
+            add_line_numbers=False, 
+            formatter_style="dracula", 
+            background="window"
+        ).scale(0.75).align_to(example_group_6.get_bottom(), UP).shift(0.1 * DOWN)
+        example_title_7 = monospace("file_2.c").scale(0.4).align_to(example_function_7.background.get_top(), UP).shift(0.1 * DOWN)
+        example_chars_7 = example_function_7.code_lines.lines[0]
+        example_caption_7 = Text("Inside same translation unit: ✖️", color=RED).scale(0.5).align_to(example_function_7.background.get_bottom(), UP).shift(0.1 * DOWN)
+        example_group_7 = VGroup(example_function_7, example_title_7, example_caption_7)
+        example_group_7.scale(0.75)
+        
+        self.play(ReplacementTransform(question_2, example_function_7), Write(example_title_7))
+        self.play(Succession(
+            Indicate(example_title_7), 
+            Indicate(example_chars_7[5][18:34], color=RED)
+        ))
+        self.play(Write(example_caption_7))
+        
+        self.end_scene()
+
+class Recursion(SectionalizedScene):
+    def construct(self):
+        self.skip_section_animations = True
+        
+        self.hkn_emblem_add()
+        
+        self.skip_section_animations = False
+
+        question = Text("Recursion?")
+        notes = Tex(r"""
+            \begin{itemize}
+                \item A programming method which involves a function calling itself
+                \item Makes implementing algorithms easier
+                \item All recursive functions can be implemented iteratively
+                \item Often produce simple and elegant solutions
+            \end{itemize}""", font_size=40
+        ).center()
+        self.play(question)
+        self.play(ReplacementTransform(question, notes))
+
+        self.end_scene()
+        self.fibonacci_visualization()
+        self.end_scene()
+        
+        example_function_7 = Code(
+            code_string=r"""
+int fibonacci(int n) {
+    // Base Case: returns itself for 0 or 1
+	if (n == 0 || n == 1) { 
+        return n;
+    } else {
+        // Recursive Case: Calls itself using the fibonacci definition
+        return fibonacci(n - 1) + fibonacci(n - 2); 
+    }
+}
+""",
+            language="c",
+            add_line_numbers=False, 
+            formatter_style="dracula"
+        )        
         
         # self.end_scene()
+
+    # NOTE: Generated by GitHub Copilot
+    def fibonacci_visualization(self):
+        # Fibonacci visualization
+        fib = [0, 1]
+        boxes = []
+
+        # create initial two boxes
+        for v in fib:
+            r = RoundedRectangle(corner_radius=0.08, width=1.2, height=1.2, stroke_width=2)
+            lbl = Text(str(v), font_size=36).move_to(r.get_center())
+            boxes.append(VGroup(r, lbl))
+
+        group = VGroup(*boxes).arrange(RIGHT, buff=0.5).to_edge(UP)
+        self.play(*[FadeIn(b) for b in boxes])
+
+        # equation / explanation area
+        eq = MathTex(r"F_n = F_{n-1} + F_{n-2}").scale(0.8).to_edge(DOWN)
+        value_line = Text("", font_size=28).next_to(eq, UP)
+        self.play(Write(eq))
+
+        # build sequence up to N
+        N = 8
+        for n in range(2, N):
+            a = boxes[-2]
+            b = boxes[-1]
+            # highlight the two previous terms
+            self.play(Circumscribe(a, fade_out=True), Circumscribe(b, fade_out=True))
+            # placeholder for new box (appears to the right)
+            new_rect = RoundedRectangle(corner_radius=0.08, width=1.2, height=1.2, stroke_width=2)
+            new_lbl = Text("?", font_size=36).move_to(new_rect.get_center())
+            new_group = VGroup(new_rect, new_lbl).next_to(boxes[-1], RIGHT, buff=0.5)
+            self.play(FadeIn(new_group))
+
+            # arrows from the two contributors
+            arr1 = Arrow(a.get_right(), new_group.get_left(), buff=0.1, stroke_width=2)
+            arr2 = Arrow(b.get_right(), new_group.get_left() + UP * 0.08, buff=0.1, stroke_width=2)
+            self.play(GrowArrow(arr1), GrowArrow(arr2))
+
+            # compute and display the sum in the equation area
+            next_val = fib[-1] + fib[-2]
+            expr = MathTex(
+                rf"F_{{{n}}}=F_{{{n-1}}}+F_{{{n-2}}}={fib[-1]}+{fib[-2]}={next_val}"
+            ).scale(0.7).to_edge(DOWN)
+            self.play(Transform(eq, expr))
+            # reveal the computed value in the new box
+            new_value = Text(str(next_val), font_size=36).move_to(new_rect.get_center())
+            self.play(Transform(new_lbl, new_value))
+            # tidy arrows (fade) and append new term
+            self.play(FadeOut(arr1), FadeOut(arr2))
+            fib.append(next_val)
+            boxes.append(new_group)
+
+            self.wait(0.5)
+
+        # final flourish: highlight full sequence and show numeric list
+        self.play(*[Indicate(b) for b in boxes])
+        list_tex = MathTex(r"\{ " + ", ".join(str(x) for x in fib) + r" \}").scale(0.8).to_edge(DOWN)
+        self.play(Transform(eq, list_tex))
+        self.wait(1)

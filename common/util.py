@@ -2,7 +2,6 @@ import inspect
 
 from manim import *
 
-
 class SectionalizedScene(Scene):
     
     def __init__(self):
@@ -28,3 +27,5 @@ class SectionalizedScene(Scene):
     
     def end_scene(self):
         self.play(FadeOut(mobject) for mobject in self.mobjects if mobject != self.hkn_emblem)
+
+monospace = lambda text: MarkupText(f"<span font_family=\"monospace\">{text}</span>")
