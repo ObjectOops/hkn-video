@@ -243,14 +243,14 @@ int main() {
                 text_cell_updated = Paragraph(val).match_width(text_cell).move_to(text_cell)
                 value_update_animations.append(Transform(text_cell, text_cell_updated))
                 value_update_animations.append(Circumscribe(text_cell))
-            if current_output != None and out != None:
+            if current_output is not None and out is not None:
                 self.remove(current_output)
-            if out != None:
+            if out is not None:
                 current_output = Text(out).to_edge(DOWN)
             self.play(
                 code_highlight.animate.match_y(code_line), 
                 *value_update_animations, 
-                AddTextLetterByLetter(current_output) if out != None else Wait()
+                AddTextLetterByLetter(current_output) if out is not None else Wait()
             )
             if (len(other) > 0):
                 self.play(*other)
@@ -334,7 +334,7 @@ class Recursion(SectionalizedScene):
         
         self.skip_section_animations = False
 
-        question = Text("Recursion?")
+        question = Text("Recursion")
         notes = Tex(r"""
             \begin{itemize}
                 \item A programming method which involves a function calling itself
@@ -343,21 +343,23 @@ class Recursion(SectionalizedScene):
                 \item Often produce simple and elegant solutions
             \end{itemize}""", font_size=40
         ).center()
-        self.play(question)
+        self.play(Write(question))
         self.play(ReplacementTransform(question, notes))
 
         self.end_scene()
         self.fibonacci_visualization()
         self.end_scene()
         
-        example_function_7 = Code(
+        example_fibonacci = Code(
             code_string=r"""
 int fibonacci(int n) {
     // Base Case: returns itself for 0 or 1
 	if (n == 0 || n == 1) { 
         return n;
-    } else {
-        // Recursive Case: Calls itself using the fibonacci definition
+    }
+    
+    // Recursive Case: Calls itself using the fibonacci definition
+    else {
         return fibonacci(n - 1) + fibonacci(n - 2); 
     }
 }
@@ -365,7 +367,28 @@ int fibonacci(int n) {
             language="c",
             add_line_numbers=False, 
             formatter_style="dracula"
-        )        
+        ).scale(0.75)
+        example_fibonacci_chars = example_fibonacci.code_lines.lines[0]
+        base_case_outline = SurroundingRectangle(remove_invisible_chars(example_fibonacci_chars[1:5]), color=ORANGE)
+        recursive_case_outline = SurroundingRectangle(remove_invisible_chars(example_fibonacci_chars[6:10]), color=GREEN)
+        self.play(Succession(
+            Write(example_fibonacci), 
+            Create(base_case_outline), 
+            Create(recursive_case_outline)
+        ))
+        
+        tips_fibonacci = [
+            "All recursive functions must have a base case and recursive case.", 
+            "The base case is what allows the function to actually stop and return something.", 
+            "Stack overflow --> segmentation fault: runtime stack grows too large.", 
+            "Check to make sure you eventually reach your base case!"
+        ]
+        current_tip = None
+        for tip in tips_fibonacci:
+            self.play(
+                FadeOut(current_tip) if current_tip is not None else Wait(), 
+                FadeIn(current_tip := Text(tip).scale(0.4).align_to(example_fibonacci, DOWN).shift(DOWN))
+            )
         
         # self.end_scene()
 
@@ -377,16 +400,15 @@ int fibonacci(int n) {
 
         # create initial two boxes
         for v in fib:
-            r = RoundedRectangle(corner_radius=0.08, width=1.2, height=1.2, stroke_width=2)
+            r = RoundedRectangle(corner_radius=0.08, width=0.75, height=0.75, stroke_width=2)
             lbl = Text(str(v), font_size=36).move_to(r.get_center())
             boxes.append(VGroup(r, lbl))
 
-        group = VGroup(*boxes).arrange(RIGHT, buff=0.5).to_edge(UP)
+        group = VGroup(*boxes).arrange(RIGHT, buff=0.5).to_edge(LEFT)
         self.play(*[FadeIn(b) for b in boxes])
 
         # equation / explanation area
-        eq = MathTex(r"F_n = F_{n-1} + F_{n-2}").scale(0.8).to_edge(DOWN)
-        value_line = Text("", font_size=28).next_to(eq, UP)
+        eq = MathTex(r"F_n = F_{n-1} + F_{n-2}").to_edge(UP)
         self.play(Write(eq))
 
         # build sequence up to N
@@ -397,21 +419,21 @@ int fibonacci(int n) {
             # highlight the two previous terms
             self.play(Circumscribe(a, fade_out=True), Circumscribe(b, fade_out=True))
             # placeholder for new box (appears to the right)
-            new_rect = RoundedRectangle(corner_radius=0.08, width=1.2, height=1.2, stroke_width=2)
+            new_rect = RoundedRectangle(corner_radius=0.08, width=0.75, height=0.75, stroke_width=2)
             new_lbl = Text("?", font_size=36).move_to(new_rect.get_center())
             new_group = VGroup(new_rect, new_lbl).next_to(boxes[-1], RIGHT, buff=0.5)
             self.play(FadeIn(new_group))
 
             # arrows from the two contributors
-            arr1 = Arrow(a.get_right(), new_group.get_left(), buff=0.1, stroke_width=2)
-            arr2 = Arrow(b.get_right(), new_group.get_left() + UP * 0.08, buff=0.1, stroke_width=2)
+            arr1 = Arrow(a.get_right() - UP * 0.25, new_group.get_left() - UP * 0.25, buff=0.1, stroke_width=2)
+            arr2 = Arrow(b.get_right() + UP * 0.25, new_group.get_left() + UP * 0.25, buff=0.1, stroke_width=2)
             self.play(GrowArrow(arr1), GrowArrow(arr2))
 
             # compute and display the sum in the equation area
             next_val = fib[-1] + fib[-2]
             expr = MathTex(
                 rf"F_{{{n}}}=F_{{{n-1}}}+F_{{{n-2}}}={fib[-1]}+{fib[-2]}={next_val}"
-            ).scale(0.7).to_edge(DOWN)
+            ).to_edge(UP)
             self.play(Transform(eq, expr))
             # reveal the computed value in the new box
             new_value = Text(str(next_val), font_size=36).move_to(new_rect.get_center())
@@ -421,10 +443,10 @@ int fibonacci(int n) {
             fib.append(next_val)
             boxes.append(new_group)
 
-            self.wait(0.5)
+            # self.wait(0.5)
 
         # final flourish: highlight full sequence and show numeric list
         self.play(*[Indicate(b) for b in boxes])
-        list_tex = MathTex(r"\{ " + ", ".join(str(x) for x in fib) + r" \}").scale(0.8).to_edge(DOWN)
+        list_tex = MathTex(r"\{ " + ", ".join(str(x) for x in fib) + r" \}").to_edge(UP)
         self.play(Transform(eq, list_tex))
-        self.wait(1)
+        # self.wait(1)
