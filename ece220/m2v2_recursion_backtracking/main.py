@@ -24,7 +24,6 @@ class Intro(SectionalizedScene):
                     \item Recursive cases
                 \end{itemize}
                 \item Backtracking
-                \item Recursion vs backtracking vs loops
             \end{itemize}""", font_size=40
         ).center()))
         
@@ -55,21 +54,29 @@ static int myFunction(int foo, int bar) {
         # Specifiers
         specifier_chars = example_function.code_lines.lines[0][0][0:6]
         specifier_highlight = SurroundingRectangle(specifier_chars, color=YELLOW)
-        specifier_annotation = Text("Specifier", font_size=25, color=YELLOW).next_to(specifier_highlight, LEFT)
+        specifier_annotation = Text(
+            "Specifier", font_size=25, color=YELLOW
+        ).next_to(specifier_highlight, LEFT)
         
         # Return Type
         return_type_chars = example_function.code_lines.lines[0][0][7:10]
         return_type_highlight = SurroundingRectangle(return_type_chars, color=GREEN)
-        return_type_annotation = Text("Return Type", font_size=25, color=GREEN).next_to(return_type_highlight, UP).shift(LEFT)
+        return_type_annotation = Text(
+            "Return Type", font_size=25, color=GREEN
+        ).next_to(return_type_highlight, UP).shift(LEFT)
         
         # Name
-        name_highlight = SurroundingRectangle(example_function.code_lines.lines[0][0][11:21], color=RED)
+        name_highlight = SurroundingRectangle(
+            example_function.code_lines.lines[0][0][11:21], color=RED
+        )
         name_annotation = Text("Name", font_size=25, color=RED).next_to(name_highlight, UP)
         
         # Parameters
         parameters_chars = example_function.code_lines.lines[0][0][22:-4]
         parameters_highlight = SurroundingRectangle(parameters_chars, color=ORANGE)
-        parameters_annotation = Text("Parameters", font_size=25, color=ORANGE).next_to(parameters_highlight, UP)
+        parameters_annotation = Text(
+            "Parameters", font_size=25, color=ORANGE
+        ).next_to(parameters_highlight, UP)
 
         highlight_annotations = [
             (return_type_highlight, return_type_annotation), 
@@ -210,12 +217,19 @@ int main() {
             col_labels=[monospace(label) for label in labels_5], 
             table=[["0", "-"]]
         ).scale(0.5).to_edge(RIGHT)
-        self.play(example_function_5.animate.scale(0.5 / 0.75).to_edge(LEFT), Create(example_table_5))
+        self.play(
+            example_function_5.animate.scale(0.5 / 0.75).to_edge(LEFT), Create(example_table_5)
+        )
 
         run_start_5 = (9, {}, None, [])
         code_highlight = SurroundingRectangle(
-            remove_invisible_chars(example_function_5.code_lines.lines[0][run_start_5[0] - 1]), buff=0, stroke_width=1
-        ).stretch_to_fit_width(example_function_5.background.width).align_to(example_function_5.background, LEFT)
+            remove_invisible_chars(example_function_5.code_lines.lines[0][run_start_5[0] - 1]), 
+            buff=0, stroke_width=1
+        ).stretch_to_fit_width(
+            example_function_5.background.width
+        ).align_to(
+            example_function_5.background, LEFT
+        )
         self.play(Create(code_highlight))
         run_5 = [
             run_start_5, 
@@ -231,7 +245,9 @@ int main() {
             (5, {}, None, []), 
             (6, {"runningCount": "3"}, None, []), 
             (11, {}, None, []), 
-            (12, {}, "runningCount: 3", [Succession(Wiggle(code_highlight), Indicate(code_highlight, scale_factor=1, color=RED))]), 
+            (12, {}, "runningCount: 3", [Succession(
+                Wiggle(code_highlight), Indicate(code_highlight, scale_factor=1, color=RED)
+            )]), 
             (14, {}, None, [])
         ]
         current_output = None
@@ -239,7 +255,9 @@ int main() {
             code_line = remove_invisible_chars(example_function_5.code_lines.lines[0][line - 1])
             value_update_animations = []
             for key, val in vals.items():
-                text_cell = example_table_5.get_entries_without_labels((1, labels_5.index(key) + 1))
+                text_cell = example_table_5.get_entries_without_labels(
+                    (1, labels_5.index(key) + 1)
+                )
                 text_cell_updated = Paragraph(val).match_width(text_cell).move_to(text_cell)
                 value_update_animations.append(Transform(text_cell, text_cell_updated))
                 value_update_animations.append(Circumscribe(text_cell))
@@ -250,7 +268,13 @@ int main() {
             self.play(
                 code_highlight.animate.match_y(code_line), 
                 *value_update_animations, 
-                TypeWithCursor(current_output) if out is not None else Wait()
+                TypeWithCursor(current_output, leave_cursor_on=False, cursor = Rectangle(
+                    color = GREY_A, 
+                    fill_color = GREY_A, 
+                    fill_opacity = 1.0, 
+                    height = 1.1 / 1.5, 
+                    width = 0.5 / 1.5, 
+                ).move_to(current_output[0])) if out is not None else Wait()
             )
             if (len(other) > 0):
                 self.play(*other)
@@ -277,7 +301,9 @@ int mySecondFunction() {
             formatter_style="dracula", 
             background="window"
         ).scale(0.75)
-        example_title_6 = monospace("file_1.c").scale(0.4).align_to(example_function_6.background.get_top(), UP).shift(0.1 * DOWN)
+        example_title_6 = monospace("file_1.c").scale(0.4).align_to(
+            example_function_6.background.get_top(), UP
+        ).shift(0.1 * DOWN)
         self.play(Create(example_function_6), Write(example_title_6))
         
         example_chars_6 = example_function_6.code_lines.lines[0]
@@ -287,7 +313,9 @@ int mySecondFunction() {
             Indicate(example_chars_6[0][0:6]), 
             Indicate(example_chars_6[5][4:20])
         ))
-        example_caption_6 = Text("Inside same translation unit: ✔️", color=GREEN).scale(0.5).align_to(example_function_6.background.get_bottom(), UP).shift(0.1 * DOWN)
+        example_caption_6 = Text(
+            "Inside same translation unit: ✔️", color=GREEN
+        ).scale(0.5).align_to(example_function_6.background.get_bottom(), UP).shift(0.1 * DOWN)
         self.play(Write(example_caption_6))
         
         example_group_6 = VGroup(example_function_6, example_title_6, example_caption_6)
@@ -311,9 +339,13 @@ int multiplier(int foo, int bar){
             formatter_style="dracula", 
             background="window"
         ).scale(0.75).align_to(example_group_6.get_bottom(), UP).shift(0.1 * DOWN)
-        example_title_7 = monospace("file_2.c").scale(0.4).align_to(example_function_7.background.get_top(), UP).shift(0.1 * DOWN)
+        example_title_7 = monospace("file_2.c").scale(0.4).align_to(
+            example_function_7.background.get_top(), UP
+        ).shift(0.1 * DOWN)
         example_chars_7 = example_function_7.code_lines.lines[0]
-        example_caption_7 = Text("Inside same translation unit: ✖️", color=RED).scale(0.5).align_to(example_function_7.background.get_bottom(), UP).shift(0.1 * DOWN)
+        example_caption_7 = Text(
+            "Inside same translation unit: ✖️", color=RED
+        ).scale(0.5).align_to(example_function_7.background.get_bottom(), UP).shift(0.1 * DOWN)
         example_group_7 = VGroup(example_function_7, example_title_7, example_caption_7)
         example_group_7.scale(0.75)
         
@@ -365,8 +397,12 @@ int fibonacci(int n) {
             formatter_style="dracula"
         ).scale(0.75)
         example_fibonacci_chars = example_fibonacci.code_lines.lines[0]
-        base_case_outline = SurroundingRectangle(remove_invisible_chars(example_fibonacci_chars[1:5]), color=ORANGE)
-        recursive_case_outline = SurroundingRectangle(remove_invisible_chars(example_fibonacci_chars[6:10]), color=GREEN)
+        base_case_outline = SurroundingRectangle(
+            remove_invisible_chars(example_fibonacci_chars[1:5]), color=ORANGE
+        )
+        recursive_case_outline = SurroundingRectangle(
+            remove_invisible_chars(example_fibonacci_chars[6:8]), color=GREEN
+        )
         self.play(Succession(
             Write(example_fibonacci), 
             Create(base_case_outline), 
@@ -383,10 +419,15 @@ int fibonacci(int n) {
         for tip in tips_fibonacci:
             self.play(
                 FadeOut(current_tip) if current_tip is not None else Wait(), 
-                FadeIn(current_tip := Text(tip).scale(0.5).align_to(example_fibonacci, DOWN).shift(DOWN))
+                FadeIn(current_tip := Text(tip).scale(0.5).align_to(
+                    example_fibonacci, DOWN
+                ).shift(DOWN))
             )
-                
-        self.play(FadeOut(current_tip, base_case_outline, recursive_case_outline), example_fibonacci.animate.scale(0.5).to_corner(UL))
+        
+        self.play(
+            FadeOut(current_tip, base_case_outline, recursive_case_outline), 
+            example_fibonacci.animate.scale(0.5).to_corner(UL)
+        )
                 
         fibonacci = lambda n: n if n == 0 or n == 1 else fibonacci(n - 1) + fibonacci(n - 2)
         def fibonacci_tree(n):
@@ -398,8 +439,14 @@ int fibonacci(int n) {
             fib_sub_2 = fibonacci_tree(n - 1)
             fib_left, fib_left_group = fib_sub_1 if n % 2 == 0 else fib_sub_2
             fib_right, fib_right_group = fib_sub_2 if n % 2 == 0 else fib_sub_1
-            fib_left_group.shift(fib_center + DOWN * 0.25 + LEFT * 1.25 - fib_left.get_edge_center(UP))
-            fib_right_group.shift(fib_center + DOWN * 0.25 + RIGHT * 1.25 + DOWN * (fibonacci(n) / 2.5 - 1 / 2.5) + RIGHT * (fibonacci(n) - 1) - fib_right.get_edge_center(UP))
+            fib_left_group.shift(
+                fib_center + DOWN * 0.25 + LEFT * 1.25 - fib_left.get_edge_center(UP)
+            )
+            fib_right_group.shift(
+                fib_center + DOWN * 0.25 + RIGHT * 1.25 
+                + DOWN * (fibonacci(n) / 2.5 - 1 / 2.5) + RIGHT * (fibonacci(n) - 1) 
+                - fib_right.get_edge_center(UP)
+            )
             return fib, VGroup(
                 fib, fib_left_group, fib_right_group, 
                 Line(fib_left.get_edge_center(UP), fib_center, buff=0.1), 
@@ -422,10 +469,13 @@ int fibonacci(int n) {
         self.play(Transform(fib_base, fibonacci_tree(4)[1].shift(UP)))
         
         # fibonacci(5)
-        self.play(Transform(fib_base, fibonacci_tree(5)[1].shift(UP * 2)))
+        self.play(Transform(fib_base, fibonacci_tree(5)[1].scale(0.9).shift(UP + LEFT * 2)))
         
         # fibonacci(6)
-        self.play(Transform(fib_base, fibonacci_tree(6)[1].scale_to_fit_width(config.frame_width).scale(0.9).to_corner(UL)), example_fibonacci.animate.shift(LEFT * 7))
+        self.play(Transform(
+            fib_base, 
+            fibonacci_tree(6)[1].scale_to_fit_width(config.frame_width).scale(0.9).to_corner(UL)
+        ), example_fibonacci.animate.shift(LEFT * 7))
         
         self.end_scene()
 
@@ -440,8 +490,9 @@ int fibonacci(int n) {
             r = RoundedRectangle(corner_radius=0.08, width=0.75, height=0.75, stroke_width=2)
             lbl = Text(str(v), font_size=36).move_to(r.get_center())
             boxes.append(VGroup(r, lbl))
-
-        self.play(*[FadeIn(b) for b in boxes])
+        
+        VGroup(*boxes).arrange(RIGHT, buff=0.5).to_edge(LEFT)
+        self.play(FadeIn(*boxes))
 
         # equation / explanation area
         eq = MathTex(r"F_n = F_{n-1} + F_{n-2}").to_edge(UP)
@@ -455,14 +506,26 @@ int fibonacci(int n) {
             # highlight the two previous terms
             self.play(Circumscribe(a, fade_out=True), Circumscribe(b, fade_out=True))
             # placeholder for new box (appears to the right)
-            new_rect = RoundedRectangle(corner_radius=0.08, width=0.75, height=0.75, stroke_width=2)
+            new_rect = RoundedRectangle(
+                corner_radius=0.08, width=0.75, height=0.75, stroke_width=2
+            )
             new_lbl = Text("?", font_size=36).move_to(new_rect.get_center())
             new_group = VGroup(new_rect, new_lbl).next_to(boxes[-1], RIGHT, buff=0.5)
             self.play(FadeIn(new_group))
 
             # arrows from the two contributors
-            arr1 = Arrow(a.get_right() - UP * 0.25, new_group.get_left() - UP * 0.25, buff=0.1, stroke_width=2)
-            arr2 = Arrow(b.get_right() + UP * 0.25, new_group.get_left() + UP * 0.25, buff=0.1, stroke_width=2)
+            arr1 = Arrow(
+                a.get_right() - UP * 0.25, 
+                new_group.get_left() - UP * 0.25, 
+                buff=0.1, 
+                stroke_width=2
+            )
+            arr2 = Arrow(
+                b.get_right() + UP * 0.25, 
+                new_group.get_left() + UP * 0.25, 
+                buff=0.1, 
+                stroke_width=2
+            )
             self.play(GrowArrow(arr1), GrowArrow(arr2))
 
             # compute and display the sum in the equation area
@@ -482,7 +545,7 @@ int fibonacci(int n) {
             # self.wait(0.5)
 
         # final flourish: highlight full sequence and show numeric list
-        self.play(*[Indicate(b) for b in boxes])
+        self.play(Indicate(b) for b in boxes)
         list_tex = MathTex(r"\{ " + ", ".join(str(x) for x in fib) + r" \}").to_edge(UP)
         self.play(Transform(eq, list_tex))
         # self.wait(1)
@@ -497,7 +560,7 @@ class Backtracking(SectionalizedScene):
         notes = Tex(r"""
             \begin{itemize}
                 \item A technique using recursion
-                \item Backtracking is often used to search solution spaces, such as trees or graphs
+                \item Backtracking is often used to search solution spaces
                 \item Time complexity isn't very good (more in CS 225)
             \end{itemize}""", font_size=40
         ).center()
@@ -564,7 +627,9 @@ mazeSolver(startPoint)
 
         code_highlight = SurroundingRectangle(
             remove_invisible_chars(example_maze.code_lines.lines[0][18]), buff=0, stroke_width=1
-        ).stretch_to_fit_width(example_maze.background.width).align_to(example_maze.background, LEFT)
+        ).stretch_to_fit_width(example_maze.background.width).align_to(
+            example_maze.background, LEFT
+        )
         self.play(Create(code_highlight))
 
         visited = np.zeros_like(maze)
