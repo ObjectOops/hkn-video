@@ -17,6 +17,9 @@ class SectionalizedScene(Scene):
     def hkn_emblem_add(self):
         self.add(self.hkn_emblem.scale(0.3).to_corner(UR))
     
+    def hkn_emblem_close(self):
+        self.play(self.hkn_emblem.animate.scale(10 / 3).center(), run_time=1.5)
+    
     def next_section(self, *args, **kwargs):
         super().next_section(*args, **kwargs, skip_animations=self.skip_section_animations)
     

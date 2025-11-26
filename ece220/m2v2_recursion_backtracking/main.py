@@ -677,3 +677,8 @@ mazeSolver(startPoint)
         solve_maze(0, 0)
         
         self.end_scene()
+
+class Conclusion(SectionalizedScene):
+    def construct(self):
+        self.hkn_emblem_add()
+        self.hkn_emblem_close()
