@@ -576,16 +576,22 @@ mazeSolver(startPoint)
             goto_line(1)
             out_of_bounds = row < 0 or row >= maze.shape[1] or col < 0 or col >= maze.shape[0]
             if not out_of_bounds:
-                self.play(Circumscribe(example_table.get_entries((row + 1, col + 1)), run_time=0.1))
+                focus_cell = SurroundingRectangle(example_table.get_entries((row + 1, col + 1)))
+                self.add(focus_cell)
+                self.wait(duration=0.1)
             
             goto_line(4)
             if out_of_bounds or visited[row][col] or maze[row][col] == "1":
+                if not out_of_bounds:
+                    self.remove(focus_cell)
                 return False
             goto_line(5)
             if maze[row][col] == "E":
+                self.remove(focus_cell)
                 return True
             
             # print(row, col)
+            self.remove(focus_cell)
             highlight = example_table.get_highlighted_cell((row + 1, col + 1), color=ORANGE)
             example_table.add_to_back(highlight)
             self.wait(duration=0.1)
@@ -604,3 +610,5 @@ mazeSolver(startPoint)
             return False
                 
         solve_maze(0, 0)
+        
+        self.end_scene()
