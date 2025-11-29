@@ -10,6 +10,14 @@
             ]
         },
         {
+            "label": "Manim Render Final Video (QH)",
+            "type": "shell",
+            "command": "export PYTHONPATH='${env:PYTHONPATH}:${workspaceFolder}' && cd ${fileDirname} && manim ./main.py -qh -a --save_sections --disable_caching --progress_bar none",
+            "problemMatcher": [
+                "$python"
+            ]
+        },
+        {
             "label": "Manim Render Frame (s)",
             "type": "shell",
             "command": "export PYTHONPATH='${env:PYTHONPATH}:${workspaceFolder}' && cd ${fileDirname} && manim -s main.py $(cat dev_scene)",
